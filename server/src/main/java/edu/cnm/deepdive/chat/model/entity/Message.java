@@ -41,5 +41,4 @@ public class Message {
   @JoinColumn(name = "channel_id", nullable = false, updatable = false)
   private Channel channel;
 
-
 }
