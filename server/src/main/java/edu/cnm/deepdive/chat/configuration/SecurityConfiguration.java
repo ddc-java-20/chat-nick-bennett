@@ -2,6 +2,7 @@ package edu.cnm.deepdive.chat.configuration;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@Profile("service")
 public class SecurityConfiguration {
 
   private final Converter<Jwt, ? extends AbstractAuthenticationToken> converter;
@@ -30,8 +32,11 @@ public class SecurityConfiguration {
   private final String clientId;
 
   @Autowired
-  public SecurityConfiguration(Converter<Jwt, ? extends AbstractAuthenticationToken> converter,
-      String issuerUri, String clientId) {
+  public SecurityConfiguration(
+      Converter<Jwt, ? extends AbstractAuthenticationToken> converter,
+      @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri,
+      @Value("${spring.security.oauth2.resourceserver.jwt.client-id}") String clientId
+  ) {
     this.converter = converter;
     this.issuerUri = issuerUri;
     this.clientId = clientId;
