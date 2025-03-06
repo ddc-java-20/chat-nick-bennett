@@ -1,0 +1,10 @@
+create sequence channel_seq start with 1 increment by 50;
+create sequence message_seq start with 1 increment by 50;
+create sequence user_profile_seq start with 1 increment by 50;
+create table channel (active boolean not null, channel_id bigint not null, external_key uuid not null unique, name varchar(50) not null unique, primary key (channel_id));
+create table message (channel_id bigint not null, message_id bigint not null, posted timestamp(6) with time zone not null, sender_id bigint not null, external_key uuid not null unique, text varchar(255) not null, primary key (message_id));
+create table user_profile (joined timestamp(6) with time zone not null, user_profile_id bigint not null, external_key uuid not null unique, display_name varchar(30) not null unique, oauth_key varchar(30) not null unique, avatar varchar(255), primary key (user_profile_id));
+create index IDXcrwxid1pqfv7ie9b1mljwoday on channel (active, name);
+create index IDXlra50h1stsg8bylg7claw7442 on user_profile (joined);
+alter table if exists message add constraint FKiimr93ytmcuira5le0sldvvma foreign key (channel_id) references channel;
+alter table if exists message add constraint FKkqbyufjgk44k5472f9i9na5d1 foreign key (sender_id) references user_profile;
