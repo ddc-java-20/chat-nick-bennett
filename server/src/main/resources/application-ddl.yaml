@@ -7,7 +7,13 @@ spring:
     properties:
       jakarta:
         persistence:
-          create-source: metadata
-          scripts:
-            action: create
-            create-target: docs/sql/ddl-server.sql
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: create
+              create-target: docs/sql/ddl-server.sql
+      hibernate:
+        hbm2ddl:
+          schema-generation:
+            script:
+              append: false
