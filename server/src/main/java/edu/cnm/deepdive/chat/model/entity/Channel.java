@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity
 @Table(
     indexes = {

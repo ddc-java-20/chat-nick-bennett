@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
 @Entity
 public class Message {
 
