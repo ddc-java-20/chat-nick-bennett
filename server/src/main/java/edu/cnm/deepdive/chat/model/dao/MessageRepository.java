@@ -10,4 +10,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
   List<Message> getAllByChannelAndPostedAfterOrderByPostedAsc(Channel channel, Instant posted);
 
+  /*
+    SELECT
+      m FROM message AS m
+      WHERE
+        m.channel = :channel
+        AND m.posted > :posted
+      ORDER BY
+        m.posted ASC
+   */
 }
