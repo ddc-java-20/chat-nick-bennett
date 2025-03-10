@@ -2,8 +2,10 @@ package edu.cnm.deepdive.chat.service;
 
 import edu.cnm.deepdive.chat.model.dao.ChannelRepository;
 import edu.cnm.deepdive.chat.model.dao.MessageRepository;
+import edu.cnm.deepdive.chat.model.entity.Channel;
 import edu.cnm.deepdive.chat.model.entity.Message;
 import edu.cnm.deepdive.chat.model.entity.User;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService implements AbstractMessageService {
+
+  private static final Duration MAX_SINCE_DURATION = Duration.ofMinutes(30);
 
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
@@ -27,13 +31,7 @@ public class MessageService implements AbstractMessageService {
   public List<Message> add(Message message, UUID channelKey, User author, Instant since) {
     return channelRepository
         .findByExternalKey(channelKey)
-        .map((channel) -> {
-          message.setChannel(channel);
-          message.setSender(author);
-          messageRepository.save(message);
-          return messageRepository
-              .getAllByChannelAndPostedAfterOrderByPostedAsc(channel, since);
-        })
+        .map((channel) -> addAndRefresh(message, author, since, channel))
         .orElseThrow();
   }
 
@@ -41,9 +39,29 @@ public class MessageService implements AbstractMessageService {
   public List<Message> getSince(UUID channelKey, Instant since) {
     return channelRepository
         .findByExternalKey(channelKey)
-        .map((channel) ->
-            messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(channel, since))
+        .map((channel) -> getSinceAtMost(since, channel))
         .orElseThrow();
+  }
+
+  private List<Message> getSinceAtMost(Instant since, Channel channel) {
+    Instant effectiveSince = getEffectiveSince(since);
+    return messageRepository
+        .getAllByChannelAndPostedAfterOrderByPostedAsc(channel, effectiveSince);
+  }
+
+  private List<Message> addAndRefresh(
+      Message message, User author, Instant since, Channel channel) {
+    message.setChannel(channel);
+    message.setSender(author);
+    messageRepository.save(message);
+    Instant effectiveSince = getEffectiveSince(since);
+    return messageRepository
+        .getAllByChannelAndPostedAfterOrderByPostedAsc(channel, effectiveSince);
+  }
+
+  private static Instant getEffectiveSince(Instant since) {
+    Instant earliestSince = Instant.now().minus(MAX_SINCE_DURATION);
+    return (since.isBefore(earliestSince)) ? earliestSince : since;
   }
 
 }
