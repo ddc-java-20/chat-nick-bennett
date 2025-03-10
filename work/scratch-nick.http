@@ -1,0 +1,47 @@
+### Retrieve my profile
+GET http://localhost:8090/chat/users/me
+Authorization: Bearer {{bearerToken}}
+
+### Retrieve a specific user's profile
+GET http://localhost:8090/chat/users/c701b52c-984d-4d4d-8ba0-3e8ce265fbf7
+Authorization: Bearer {{bearerToken}}
+
+### List all channels
+GET http://localhost:8090/chat/channels
+Authorization: Bearer {{bearerToken}}
+
+### Modify active flag of specified channel
+PUT http://localhost:8090/chat/channels/648b27dd-65b1-4092-9c8c-aab91f5b7dbc/active
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+true
+
+###
+POST http://localhost:8090/chat/channels
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Trogdor",
+  "active": true
+}
+
+### Get all messages in past 30 minutes for specified channel
+GET http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/messages
+Authorization: Bearer {{bearerToken}}
+
+### Get all messages since specified time for specified channel
+GET http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/messages?since=1741635600000
+Authorization: Bearer {{bearerToken}}
+
+###
+POST http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/messages
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "text": "Trogdor was a man...well, he was a dragon...at least, he was a dragon-man."
+}
+
