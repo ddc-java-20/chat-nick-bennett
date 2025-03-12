@@ -7,7 +7,6 @@ import edu.cnm.deepdive.chat.model.entity.Message;
 import edu.cnm.deepdive.chat.model.entity.User;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -15,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -24,6 +24,9 @@ public class MessageService implements AbstractMessageService {
   private static final Duration MAX_SINCE_DURATION = Duration.ofMinutes(30);
   private static final Long POLLING_TIMEOUT_MS = 20_000L;
   private static final int POLLING_POOL_SIZE = 4;
+  private static final Long POLLING_INTERVAL_MS = 2000L;
+  private static final PageRequest TOP_ONE = PageRequest.of(0, 1);
+  private static final List<Message> EMPTY_MESSAGE_LIST = List.of();
 
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
@@ -54,21 +57,38 @@ public class MessageService implements AbstractMessageService {
 
   @Override
   public DeferredResult<List<Message>> pollSince(UUID channelKey, Instant since) {
+    return channelRepository
+        .findByExternalKey(channelKey)
+        .map((channel) -> setupPolling(channel, since))
+        .orElseThrow();
+  }
+
+  private DeferredResult<List<Message>> setupPolling(Channel channel, Instant since) {
     DeferredResult<List<Message>> result = new DeferredResult<>(POLLING_TIMEOUT_MS);
-    ScheduledFuture<?>[] future = new ScheduledFuture<?>[1];
-    result.onTimeout(() -> {
-      result.setResult(List.of());
-      future[0].cancel(true);
-    });
-    Runnable runnable = () -> {
-      if (!messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(, since).isEmpty()) {
-        result.setResult(
-            messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(, since));
-        future[0].cancel(true);
-      }
-    };
-    future[0] = scheduler.scheduleWithFixedDelay(runnable, 2000L, 2000L, TimeUnit.MILLISECONDS);
+    ScheduledFuture<?>[] futurePolling = new ScheduledFuture<?>[1];
+    Runnable timeoutTask = () -> timeoutWithEmptyList(result, futurePolling);
+    result.onTimeout(timeoutTask);
+    Runnable pollingTask = () -> checkForNewMessages(channel, since, result, futurePolling);
+    futurePolling[0] = scheduler.scheduleWithFixedDelay(
+        pollingTask, POLLING_INTERVAL_MS, POLLING_INTERVAL_MS, TimeUnit.MILLISECONDS);
     return result;
+  }
+
+  private static void timeoutWithEmptyList(
+      DeferredResult<List<Message>> result, ScheduledFuture<?>[] futurePolling) {
+    result.setResult(EMPTY_MESSAGE_LIST);
+    futurePolling[0].cancel(true);
+  }
+
+  private void checkForNewMessages(Channel channel, Instant since,
+      DeferredResult<List<Message>> result, ScheduledFuture<?>[] futurePolling) {
+    if (!messageRepository
+        .getLastPostedByChannelAndPostedAfter(channel, since, TOP_ONE)
+        .isEmpty()) {
+      result.setResult(
+          messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(channel, since));
+      futurePolling[0].cancel(true);
+    }
   }
 
   private List<Message> getSinceAtMost(Instant since, Channel channel) {
