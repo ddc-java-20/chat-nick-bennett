@@ -10,21 +10,30 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.DeferredResult;
 
 @Service
 public class MessageService implements AbstractMessageService {
 
   private static final Duration MAX_SINCE_DURATION = Duration.ofMinutes(30);
+  private static final Long POLLING_TIMEOUT_MS = 20_000L;
+  private static final int POLLING_POOL_SIZE = 4;
 
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
+  private final ScheduledExecutorService scheduler;
 
   @Autowired
   public MessageService(MessageRepository messageRepository, ChannelRepository channelRepository) {
     this.messageRepository = messageRepository;
     this.channelRepository = channelRepository;
+    scheduler = Executors.newScheduledThreadPool(POLLING_POOL_SIZE);
   }
 
   @Override
@@ -41,6 +50,25 @@ public class MessageService implements AbstractMessageService {
         .findByExternalKey(channelKey)
         .map((channel) -> getSinceAtMost(since, channel))
         .orElseThrow();
+  }
+
+  @Override
+  public DeferredResult<List<Message>> pollSince(UUID channelKey, Instant since) {
+    DeferredResult<List<Message>> result = new DeferredResult<>(POLLING_TIMEOUT_MS);
+    ScheduledFuture<?>[] future = new ScheduledFuture<?>[1];
+    result.onTimeout(() -> {
+      result.setResult(List.of());
+      future[0].cancel(true);
+    });
+    Runnable runnable = () -> {
+      if (!messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(, since).isEmpty()) {
+        result.setResult(
+            messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(, since));
+        future[0].cancel(true);
+      }
+    };
+    future[0] = scheduler.scheduleWithFixedDelay(runnable, 2000L, 2000L, TimeUnit.MILLISECONDS);
+    return result;
   }
 
   private List<Message> getSinceAtMost(Instant since, Channel channel) {
