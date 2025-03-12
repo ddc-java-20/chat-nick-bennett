@@ -2,6 +2,16 @@
 GET http://localhost:8090/chat/users/me
 Authorization: Bearer {{bearerToken}}
 
+### Update my profile
+PUT http://localhost:8090/chat/users/me
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "displayName": "Nick",
+  "avatar": null
+}
+
 ### Retrieve a specific user's profile
 GET http://localhost:8090/chat/users/c701b52c-984d-4d4d-8ba0-3e8ce265fbf7
 Authorization: Bearer {{bearerToken}}

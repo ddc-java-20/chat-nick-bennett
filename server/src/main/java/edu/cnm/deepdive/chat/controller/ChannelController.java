@@ -77,5 +77,5 @@ public class ChannelController {
   public List<Channel> getAll() {
     return channelService.getAll();
   }
-
+  
 }
