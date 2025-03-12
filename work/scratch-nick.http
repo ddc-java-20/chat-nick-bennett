@@ -23,7 +23,7 @@ Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
 {
-  "name": "Trogdor",
+  "name": "Spaceman Spiff",
   "active": true
 }
 
@@ -32,16 +32,16 @@ GET http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/mes
 Authorization: Bearer {{bearerToken}}
 
 ### Get all messages since specified time for specified channel
-GET http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/messages?since=1741635600000
+GET http://localhost:8090/chat/channels/{{channelKey}}/messages?since=1741810210000
 Authorization: Bearer {{bearerToken}}
 
 ###
-POST http://localhost:8090/chat/channels/0a06182e-3dcb-44a8-8e0f-bbe36fdacdac/messages
+POST http://localhost:8090/chat/channels/{{channelKey}}/messages
 Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 Accept: application/json
 
 {
-  "text": "Trogdor was a man...well, he was a dragon...at least, he was a dragon-man."
+  "text": "Spaceman Spiff has been transmogrified!"
 }
 

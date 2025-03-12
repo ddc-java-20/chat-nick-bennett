@@ -22,6 +22,9 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
+@Table(indexes = {
+    @Index(columnList = "channel_id, posted")
+})
 @JsonInclude(Include.NON_NULL)
 public class Message {
 
