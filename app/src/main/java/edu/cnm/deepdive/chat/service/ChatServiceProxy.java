@@ -44,6 +44,6 @@ public interface ChatServiceProxy {
 
   @POST("channels/{key}/messages")
   Single<List<Message>> postMessage(@Body Message message, @Path("key") UUID key, 
-      @Query("since") long since, @Header("Authorization") String bearerToken);
+      @Query("since") Instant since, @Header("Authorization") String bearerToken);
   
 }

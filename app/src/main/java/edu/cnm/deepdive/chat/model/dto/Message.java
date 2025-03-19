@@ -2,9 +2,14 @@ package edu.cnm.deepdive.chat.model.dto;
 
 import com.google.gson.annotations.Expose;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.UUID;
 
 public class Message {
+
+  private static final Comparator<Message> NATURAL_ORDER_COMPARATOR =
+      Comparator.comparing(Message::getPosted)
+          .thenComparing(Message::getKey);
 
   @Expose(serialize = false)
   private UUID key;

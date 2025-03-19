@@ -55,8 +55,8 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   public void setSelectedChannel(@NonNull Channel channel) {
     if (!channel.equals(selectedChannel.getValue())) {
       messages.setValue(new LinkedList<>());
-      // TODO: 2025-03-19 Start a new query for messages in the selected channel.
       selectedChannel.setValue(channel);
+      fetchMessages();
     }
   }
 
@@ -65,6 +65,7 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   }
 
   public void fetchChannels() {
+    throwable.setValue(null);
     messageService
         .getChannels(true)
         .subscribe(
@@ -74,15 +75,13 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
         );
   }
 
+  /**
+   * @noinspection DataFlowIssue
+   */
   public void fetchMessages() {
     throwable.postValue(null);
     List<Message> messages = this.messages.getValue();
-    //noinspection SequencedCollectionMethodCanBeUsed,DataFlowIssue
-    Instant since = messages.isEmpty()
-        ? Instant.MIN
-        : messages
-            .get(messages.size() -1)
-            .getPosted();
+    Instant since = getSince(messages);
     messageService
         .getMessages(selectedChannel.getValue().getKey(), since)
         .subscribe(
@@ -96,10 +95,44 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
         );
   }
 
+  /**
+   * @noinspection DataFlowIssue
+   */
+  public void sendMessage(Message message) {
+    throwable.setValue(null);
+    Instant since = getSince(messages.getValue());
+    messageService
+        .sendMessage(selectedChannel.getValue().getKey(), message, since)
+        .ignoreElement()
+        .subscribe(
+            () -> {
+            },
+            this::postThrowable,
+            pending
+        );
+  }
+
+  @Override
+  public void onResume(@NonNull LifecycleOwner owner) {
+    DefaultLifecycleObserver.super.onResume(owner);
+    if (selectedChannel.getValue() != null) {
+      fetchMessages();
+    }
+  }
+
   @Override
   public void onStop(@NonNull LifecycleOwner owner) {
     pending.clear();
     DefaultLifecycleObserver.super.onStop(owner);
+  }
+
+  private static Instant getSince(List<Message> messages) {
+    //noinspection SequencedCollectionMethodCanBeUsed
+    return messages.isEmpty()
+        ? Instant.MIN
+        : messages
+            .get(messages.size() - 1)
+            .getPosted();
   }
 
   private void postThrowable(Throwable throwable) {
