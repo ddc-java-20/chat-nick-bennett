@@ -22,7 +22,7 @@ public class MessageService {
   private final Scheduler scheduler;
 
   @Inject
-  public MessageService(ChatServiceProxy proxy, ChatServiceLongPollingProxy longPollingProxy,
+  MessageService(ChatServiceProxy proxy, ChatServiceLongPollingProxy longPollingProxy,
       GoogleSignInService signInService) {
     this.proxy = proxy;
     this.longPollingProxy = longPollingProxy;
@@ -30,7 +30,7 @@ public class MessageService {
     scheduler = Schedulers.io();
   }
 
-  Single<List<Message>> getMessages(UUID channelKey, Instant since) {
+  public Single<List<Message>> getMessages(UUID channelKey, Instant since) {
     return signInService
         .refreshBearerToken()
         .observeOn(scheduler)
@@ -39,7 +39,7 @@ public class MessageService {
             .getSince(channelKey, since.toEpochMilli(), bearerToken));
   }
 
-  Single<List<Message>> sendMessage(UUID channelKey, Message message, Instant since) {
+  public Single<List<Message>> sendMessage(UUID channelKey, Message message, Instant since) {
     return signInService
         .refreshBearerToken()
         .observeOn(scheduler)
@@ -48,7 +48,7 @@ public class MessageService {
             .postMessage(message, channelKey, since.toEpochMilli(), bearerToken));
   }
 
-  Single<List<Channel>> getChannels(boolean active) {
+  public Single<List<Channel>> getChannels(boolean active) {
     return signInService
         .refreshBearerToken()
         .observeOn(scheduler)
