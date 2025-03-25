@@ -13,6 +13,7 @@ import edu.cnm.deepdive.chat.model.dto.Channel;
 import edu.cnm.deepdive.chat.model.dto.Message;
 import edu.cnm.deepdive.chat.service.MessageService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   private final MutableLiveData<Channel> selectedChannel;
   private final MutableLiveData<Throwable> throwable;
   private final CompositeDisposable pending;
+
+  private Disposable poll;
 
   @Inject
   public MessageViewModel(MessageService messageService) {
@@ -59,6 +62,8 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
     if (!Objects.equals(channel, selectedChannel.getValue())) {
       messages.postValue(new LinkedList<>());
       selectedChannel.postValue(channel);
+      //noinspection DataFlowIssue
+      messages.getValue().clear();
       fetchMessages(channel);
     }
   }
@@ -84,9 +89,12 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   public void fetchMessages(Channel selectedChannel) {
     if (selectedChannel != null) {
       throwable.postValue(null);
+      if (poll != null) {
+        poll.dispose();
+      }
       List<Message> messages = this.messages.getValue();
       Instant since = getSince(messages);
-      messageService
+      poll = messageService
           .getMessages(selectedChannel.getKey(), since)
           .subscribe(
               (msgs) -> {
