@@ -1,5 +1,6 @@
 package edu.cnm.deepdive.chat.model.dto;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.gson.annotations.Expose;
 import java.util.UUID;
@@ -55,6 +56,12 @@ public class Channel {
       result = false;
     }
     return result;
+  }
+
+  @NonNull
+  @Override
+  public String toString() {
+    return name;
   }
 
 }
