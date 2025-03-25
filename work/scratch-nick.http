@@ -52,6 +52,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "text": "Spaceman Spiff has been transmogrified!"
+  "text": "This is a long, but not too long, message"
 }
 
