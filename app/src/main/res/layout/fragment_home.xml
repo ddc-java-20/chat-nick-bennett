@@ -24,12 +24,14 @@
 
   <com.google.android.material.textfield.TextInputLayout
     android:id="@+id/message_layout"
-    android:layout_width="match_parent"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/half_dynamic_spacing"
     app:hintEnabled="true"
     app:hintAnimationEnabled="true"
-    android:layout_margin="@dimen/half_dynamic_spacing"
-    app:layout_constraintBottom_toBottomOf="parent">
+    app:layout_constraintEnd_toStartOf="@id/send"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
 
     <com.google.android.material.textfield.TextInputEditText
       android:id="@+id/message"
@@ -41,5 +43,18 @@
       android:hint="@string/new_message_hint"/>
 
   </com.google.android.material.textfield.TextInputLayout>
+
+  <ImageButton
+    android:id="@+id/send"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/half_dynamic_spacing"
+    android:src="@drawable/send"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:tooltipText="@string/send_message_description"
+    android:contentDescription="@string/send_message_description"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="@id/message_layout"
+    app:layout_constraintBottom_toBottomOf="@id/message_layout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

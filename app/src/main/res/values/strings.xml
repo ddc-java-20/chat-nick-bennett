@@ -4,4 +4,5 @@
   <string name="sign_out_title">Sign out</string>
   <string name="login_fragment_label">Sign In</string>
   <string name="new_message_hint">New message</string>
+  <string name="send_message_description">Send message</string>
 </resources>
