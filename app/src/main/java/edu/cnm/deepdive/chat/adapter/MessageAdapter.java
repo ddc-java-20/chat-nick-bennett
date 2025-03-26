@@ -49,7 +49,7 @@ public class MessageAdapter extends Adapter<ViewHolder> {
 
   public void setMessages(@NonNull List<Message> messages) {
     if (!messages.isEmpty()) {
-      int size = messages.size();
+      int size = this.messages.size();
       this.messages.clear();
       this.messages.addAll(messages);
       notifyItemRangeInserted(size, messages.size());

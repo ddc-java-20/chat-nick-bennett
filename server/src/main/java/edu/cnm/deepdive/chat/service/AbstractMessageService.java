@@ -11,8 +11,6 @@ public interface AbstractMessageService {
 
   List<Message> add(Message message, UUID channelKey, User author, Instant since);
 
-  List<Message> getSince(UUID channelKey, Instant since);
-
   DeferredResult<List<Message>> pollSince(UUID channelKey, Instant since);
 
 }

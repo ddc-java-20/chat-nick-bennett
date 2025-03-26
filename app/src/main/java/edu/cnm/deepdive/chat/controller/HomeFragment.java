@@ -27,6 +27,7 @@ import edu.cnm.deepdive.chat.model.dto.Message;
 import edu.cnm.deepdive.chat.viewmodel.LoginViewModel;
 import edu.cnm.deepdive.chat.viewmodel.MessageViewModel;
 import java.util.List;
+import java.util.Objects;
 import javax.inject.Inject;
 
 /** @noinspection SequencedCollectionMethodCanBeUsed*/
@@ -93,6 +94,17 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     return handled;
   }
 
+  @Override
+  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    Channel channel = (Channel) parent.getItemAtPosition(position);
+    messageViewModel.setSelectedChannel(channel);
+  }
+
+  @Override
+  public void onNothingSelected(AdapterView<?> parent) {
+    // Ignore; this doesn't happen with a Spinner.
+  }
+
   private void setupLoginViewModel(LifecycleOwner owner) {
     loginViewModel = new ViewModelProvider(requireActivity())
         .get(LoginViewModel.class);
@@ -121,16 +133,20 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
         });
     messageViewModel
         .getMessages()
-        .observe(owner, messages -> {
+        .observe(owner, (messages) -> {
           adapter.setMessages(messages);
           binding.messages.scrollToPosition(messages.size() - 1);
+          binding.loadingIndicator.setVisibility(View.GONE);
         });
     messageViewModel
         .getSelectedChannel()
         .observe(owner, (channel) -> {
-          selectedChannel = channel;
-          setChannelSelection();
-          adapter.setMessages(List.of());
+          if (!Objects.equals(selectedChannel, channel)) {
+            selectedChannel = channel;
+            setChannelSelection();
+            adapter.setMessages(List.of());
+            binding.loadingIndicator.setVisibility(View.VISIBLE);
+          }
         });
   }
 
@@ -141,17 +157,6 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
         binding.channels.setSelection(position, true);
       }
     }
-  }
-
-  @Override
-  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    Channel channel = (Channel) parent.getItemAtPosition(position);
-    messageViewModel.setSelectedChannel(channel);
-  }
-
-  @Override
-  public void onNothingSelected(AdapterView<?> parent) {
-    // Ignore; this doesn't happen with a Spinner.
   }
 
 }

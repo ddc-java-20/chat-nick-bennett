@@ -48,14 +48,6 @@ public class MessageService implements AbstractMessageService {
   }
 
   @Override
-  public List<Message> getSince(UUID channelKey, Instant since) {
-    return channelRepository
-        .findByExternalKey(channelKey)
-        .map((channel) -> getSinceAtMost(since, channel))
-        .orElseThrow();
-  }
-
-  @Override
   public DeferredResult<List<Message>> pollSince(UUID channelKey, Instant since) {
     return channelRepository
         .findByExternalKey(channelKey)
@@ -82,11 +74,12 @@ public class MessageService implements AbstractMessageService {
 
   private void checkForNewMessages(Channel channel, Instant since,
       DeferredResult<List<Message>> result, ScheduledFuture<?>[] futurePolling) {
+    Instant effectiveSince = getEffectiveSince(since);
     if (!messageRepository
-        .getLastPostedByChannelAndPostedAfter(channel, since, TOP_ONE)
+        .getLastPostedByChannelAndPostedAfter(channel, effectiveSince, TOP_ONE)
         .isEmpty()) {
       result.setResult(
-          messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(channel, since));
+          messageRepository.getAllByChannelAndPostedAfterOrderByPostedAsc(channel, effectiveSince));
       futurePolling[0].cancel(true);
     }
   }
