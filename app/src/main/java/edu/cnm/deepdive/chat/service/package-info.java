@@ -1,5 +1,4 @@
 /**
- * Repository and service classes providing access to device &amp; external services, permissions
- * &amp; preferences, and the app's persistent data store.
+ * Repository and service classes providing business logic and access to external services.
  */
 package edu.cnm.deepdive.chat.service;

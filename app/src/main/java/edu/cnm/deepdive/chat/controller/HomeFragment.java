@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.chat.R;
 import edu.cnm.deepdive.chat.adapter.MessageAdapter;
@@ -30,10 +31,10 @@ import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
 
-/** @noinspection SequencedCollectionMethodCanBeUsed*/
 @AndroidEntryPoint
 public class HomeFragment extends Fragment implements MenuProvider, OnItemSelectedListener {
 
+  /** @noinspection unused*/
   private static final String TAG = HomeFragment.class.getSimpleName();
 
   @Inject
@@ -50,17 +51,9 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     binding = FragmentHomeBinding.inflate(inflater, container, false);
-    // TODO: 2025-03-19 Attach listener to send button, so that when clicked, a new Message instance
-    //  is created and passed to messageViewModel.
     binding.messages.setAdapter(adapter);
     binding.channels.setOnItemSelectedListener(this);
-    binding.send.setOnClickListener((v) -> {
-      Message message = new Message();
-      //noinspection DataFlowIssue
-      message.setText(binding.message.getText().toString().strip());
-      messageViewModel.sendMessage(message);
-      binding.message.setText("");
-    });
+    binding.send.setOnClickListener((v) -> sendMessage());
     return binding.getRoot();
   }
 
@@ -86,10 +79,11 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
 
   @Override
   public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-    boolean handled = false;
+    boolean handled = true;
     if (menuItem.getItemId() == R.id.sign_out) {
       loginViewModel.signOut();
-      handled = true;
+    } else {
+      handled = false;
     }
     return handled;
   }
@@ -105,17 +99,20 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     // Ignore; this doesn't happen with a Spinner.
   }
 
+  private void sendMessage() {
+    Message message = new Message();
+    //noinspection DataFlowIssue
+    message.setText(binding.message.getText().toString().strip());
+    messageViewModel.sendMessage(message);
+    binding.message.setText("");
+  }
+
   private void setupLoginViewModel(LifecycleOwner owner) {
     loginViewModel = new ViewModelProvider(requireActivity())
         .get(LoginViewModel.class);
     loginViewModel
         .getAccount()
-        .observe(owner, (account) -> {
-          if (account == null) {
-            Navigation.findNavController(binding.getRoot())
-                .navigate(HomeFragmentDirections.navigateToPreLoginFragment());
-          }
-        });
+        .observe(owner, this::startLoginWorkflow);
   }
 
   private void setupMessageViewModel(LifecycleOwner owner) {
@@ -124,30 +121,44 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     getLifecycle().addObserver(messageViewModel);
     messageViewModel
         .getChannels()
-        .observe(owner, (channels) -> {
-          this.channels = channels;
-          ArrayAdapter<Channel> adapter = new ArrayAdapter<>(requireContext(),
-              android.R.layout.simple_list_item_1, channels);
-          binding.channels.setAdapter(adapter);
-          setChannelSelection();
-        });
+        .observe(owner, this::handleChannels);
     messageViewModel
         .getMessages()
-        .observe(owner, (messages) -> {
-          adapter.setMessages(messages);
-          binding.messages.scrollToPosition(messages.size() - 1);
-          binding.loadingIndicator.setVisibility(View.GONE);
-        });
+        .observe(owner, this::handleMessages);
     messageViewModel
         .getSelectedChannel()
-        .observe(owner, (channel) -> {
-          if (!Objects.equals(selectedChannel, channel)) {
-            selectedChannel = channel;
-            setChannelSelection();
-            adapter.setMessages(List.of());
-            binding.loadingIndicator.setVisibility(View.VISIBLE);
-          }
-        });
+        .observe(owner, this::handleSelectedChannel);
+  }
+
+  /** @noinspection deprecation*/
+  private void startLoginWorkflow(GoogleSignInAccount account) {
+    if (account == null) {
+      Navigation.findNavController(binding.getRoot())
+          .navigate(HomeFragmentDirections.navigateToPreLoginFragment());
+    }
+  }
+
+  private void handleChannels(List<Channel> channels) {
+    this.channels = channels;
+    ArrayAdapter<Channel> adapter = new ArrayAdapter<>(requireContext(),
+        android.R.layout.simple_list_item_1, channels);
+    binding.channels.setAdapter(adapter);
+    setChannelSelection();
+  }
+
+  private void handleMessages(List<Message> messages) {
+    adapter.setMessages(messages);
+    binding.messages.scrollToPosition(messages.size() - 1);
+    binding.loadingIndicator.setVisibility(View.GONE);
+  }
+
+  private void handleSelectedChannel(Channel channel) {
+    if (!Objects.equals(selectedChannel, channel)) {
+      selectedChannel = channel;
+      setChannelSelection();
+      adapter.setMessages(List.of());
+      binding.loadingIndicator.setVisibility(View.VISIBLE);
+    }
   }
 
   private void setChannelSelection() {

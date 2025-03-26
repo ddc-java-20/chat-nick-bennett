@@ -9,13 +9,11 @@ import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
-import edu.cnm.deepdive.chat.InstantDeserializer;
 import edu.cnm.deepdive.chat.R;
 import edu.cnm.deepdive.chat.service.ChatServiceLongPollingProxy;
 import edu.cnm.deepdive.chat.service.ChatServiceProxy;
 import java.time.Duration;
 import java.time.Instant;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -29,7 +27,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @InstallIn(SingletonComponent.class)
 public class ProxyModule {
 
-  @Inject
   ProxyModule() {}
 
   @Provides

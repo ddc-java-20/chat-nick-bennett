@@ -17,6 +17,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
+/** @noinspection unused*/
 public interface ChatServiceProxy {
 
   @GET("users/me")

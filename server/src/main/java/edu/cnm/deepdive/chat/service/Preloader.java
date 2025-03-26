@@ -1,7 +1,7 @@
 package edu.cnm.deepdive.chat.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.cnm.deepdive.chat.model.dao.ChannelRepository;
+import edu.cnm.deepdive.chat.dao.ChannelRepository;
 import edu.cnm.deepdive.chat.model.entity.Channel;
 import java.io.InputStream;
 import java.util.Arrays;

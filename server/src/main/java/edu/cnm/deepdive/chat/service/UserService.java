@@ -1,6 +1,6 @@
 package edu.cnm.deepdive.chat.service;
 
-import edu.cnm.deepdive.chat.model.dao.UserRepository;
+import edu.cnm.deepdive.chat.dao.UserRepository;
 import edu.cnm.deepdive.chat.model.entity.User;
 import java.net.URL;
 import java.util.UUID;

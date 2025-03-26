@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.inject.Inject;
 
-/** @noinspection SequencedCollectionMethodCanBeUsed*/
+/** @noinspection SequencedCollectionMethodCanBeUsed, unused */
 @HiltViewModel
 public class MessageViewModel extends ViewModel implements DefaultLifecycleObserver {
 

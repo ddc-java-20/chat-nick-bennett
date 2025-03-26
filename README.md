@@ -1,4 +1,4 @@
-# Chat CLient-Server application
+# Chat Client-Server application
 
 ## Summary
 

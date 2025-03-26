@@ -1,7 +1,7 @@
 package edu.cnm.deepdive.chat.service;
 
-import edu.cnm.deepdive.chat.model.dao.ChannelRepository;
-import edu.cnm.deepdive.chat.model.dao.MessageRepository;
+import edu.cnm.deepdive.chat.dao.ChannelRepository;
+import edu.cnm.deepdive.chat.dao.MessageRepository;
 import edu.cnm.deepdive.chat.model.entity.Channel;
 import edu.cnm.deepdive.chat.model.entity.Message;
 import edu.cnm.deepdive.chat.model.entity.User;

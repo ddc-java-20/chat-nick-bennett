@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.chat.model.dao;
+package edu.cnm.deepdive.chat.dao;
 
 import edu.cnm.deepdive.chat.model.entity.Channel;
 import java.util.List;

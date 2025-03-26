@@ -5,7 +5,7 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
-import edu.cnm.deepdive.chat.InstantDeserializer;
+import edu.cnm.deepdive.chat.adapter.InstantDeserializer;
 import java.time.Instant;
 
 @Module

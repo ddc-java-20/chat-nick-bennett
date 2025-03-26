@@ -19,12 +19,13 @@ import android.app.Application;
 import dagger.hilt.android.HiltAndroidApp;
 
 /**
- * Initializes (in the {@link #onCreate()} method) application-level resources that cannot be
- * handled with Hilt dependency injection. This class <strong>must</strong> be referenced in
- * {@code AndroidManifest.xml}, or it will not be loaded and used by the Android system.
+ * Entry point of Chat application. Initializes (in the {@link #onCreate()} method)
+ * application-level resources that cannot be handled with Hilt dependency injection. This class
+ * <strong>must</strong> be referenced in {@code AndroidManifest.xml}, or it will not be loaded and
+ * used by the Android system.
  */
 @HiltAndroidApp
-public class ChatApplication extends Application { // TODO Rename this class as aappropriate.
+public class ChatApplication extends Application {
 
   @Override
   public void onCreate() {

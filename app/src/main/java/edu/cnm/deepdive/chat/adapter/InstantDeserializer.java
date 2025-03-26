@@ -1,4 +1,4 @@
-package edu.cnm.deepdive.chat;
+package edu.cnm.deepdive.chat.adapter;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
