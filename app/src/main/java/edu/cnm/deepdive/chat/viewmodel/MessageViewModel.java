@@ -13,6 +13,7 @@ import edu.cnm.deepdive.chat.model.dto.Channel;
 import edu.cnm.deepdive.chat.model.dto.Message;
 import edu.cnm.deepdive.chat.service.MessageService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   private final MutableLiveData<Channel> selectedChannel;
   private final MutableLiveData<Throwable> throwable;
   private final CompositeDisposable pending;
+
+  private Disposable poll;
 
   @Inject
   public MessageViewModel(MessageService messageService) {
@@ -59,7 +62,10 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
     if (!Objects.equals(channel, selectedChannel.getValue())) {
       messages.postValue(new LinkedList<>());
       selectedChannel.postValue(channel);
-      fetchMessages(channel);
+      List<Message> msgs = messages.getValue();
+      //noinspection DataFlowIssue
+      msgs.clear();
+      fetchMessages(channel, getSince(msgs));
     }
   }
 
@@ -81,18 +87,24 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   /**
    * @noinspection DataFlowIssue
    */
-  public void fetchMessages(Channel selectedChannel) {
+  public void fetchMessages(Channel selectedChannel, Instant since) {
     if (selectedChannel != null) {
       throwable.postValue(null);
-      List<Message> messages = this.messages.getValue();
-      Instant since = getSince(messages);
-      messageService
+      if (poll != null) {
+        poll.dispose();
+      }
+      poll = messageService
           .getMessages(selectedChannel.getKey(), since)
           .subscribe(
               (msgs) -> {
-                messages.addAll(msgs);
+                List<Message> messages = this.messages.getValue();
+                if (!msgs.isEmpty()) {
+                  messages.addAll(msgs);
+                  fetchMessages(selectedChannel, getSince(msgs));
+                } else {
+                  fetchMessages(selectedChannel, since);
+                }
                 this.messages.postValue(messages);
-                fetchMessages(selectedChannel);
               },
               this::postThrowable,
               pending
@@ -122,7 +134,10 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
     DefaultLifecycleObserver.super.onResume(owner);
     Channel channel = selectedChannel.getValue();
     if (channel != null) {
-      fetchMessages(channel);
+      List<Message> messages = this.messages.getValue();
+      this.messages.postValue(messages);
+      //noinspection DataFlowIssue
+      fetchMessages(channel, getSince(messages));
     }
   }
 
