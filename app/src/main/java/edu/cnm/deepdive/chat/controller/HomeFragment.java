@@ -1,7 +1,6 @@
 package edu.cnm.deepdive.chat.controller;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,18 +20,24 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.chat.R;
+import edu.cnm.deepdive.chat.adapter.MessageAdapter;
 import edu.cnm.deepdive.chat.databinding.FragmentHomeBinding;
 import edu.cnm.deepdive.chat.model.dto.Channel;
 import edu.cnm.deepdive.chat.model.dto.Message;
 import edu.cnm.deepdive.chat.viewmodel.LoginViewModel;
 import edu.cnm.deepdive.chat.viewmodel.MessageViewModel;
 import java.util.List;
+import java.util.Objects;
+import javax.inject.Inject;
 
 /** @noinspection SequencedCollectionMethodCanBeUsed*/
 @AndroidEntryPoint
 public class HomeFragment extends Fragment implements MenuProvider, OnItemSelectedListener {
 
   private static final String TAG = HomeFragment.class.getSimpleName();
+
+  @Inject
+  MessageAdapter adapter;
 
   private FragmentHomeBinding binding;
   private LoginViewModel loginViewModel;
@@ -47,6 +52,7 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     binding = FragmentHomeBinding.inflate(inflater, container, false);
     // TODO: 2025-03-19 Attach listener to send button, so that when clicked, a new Message instance
     //  is created and passed to messageViewModel.
+    binding.messages.setAdapter(adapter);
     binding.channels.setOnItemSelectedListener(this);
     binding.send.setOnClickListener((v) -> {
       Message message = new Message();
@@ -88,15 +94,24 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     return handled;
   }
 
+  @Override
+  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    Channel channel = (Channel) parent.getItemAtPosition(position);
+    messageViewModel.setSelectedChannel(channel);
+  }
+
+  @Override
+  public void onNothingSelected(AdapterView<?> parent) {
+    // Ignore; this doesn't happen with a Spinner.
+  }
+
   private void setupLoginViewModel(LifecycleOwner owner) {
     loginViewModel = new ViewModelProvider(requireActivity())
         .get(LoginViewModel.class);
     loginViewModel
         .getAccount()
         .observe(owner, (account) -> {
-          if (account != null) {
-            Log.d(TAG, "Bearer " + account.getIdToken());
-          } else {
+          if (account == null) {
             Navigation.findNavController(binding.getRoot())
                 .navigate(HomeFragmentDirections.navigateToPreLoginFragment());
           }
@@ -119,15 +134,19 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
     messageViewModel
         .getMessages()
         .observe(owner, (messages) -> {
-          // TODO: 2025-03-19 Pass data to RecyclerView adapter, and notify adapter that the data
-          //  has changed.
-          // TODO: 2025-03-19 Scroll so that the most recent message is visible.
+          adapter.setMessages(messages);
+          binding.messages.scrollToPosition(messages.size() - 1);
+          binding.loadingIndicator.setVisibility(View.GONE);
         });
     messageViewModel
         .getSelectedChannel()
         .observe(owner, (channel) -> {
-          selectedChannel = channel;
-          setChannelSelection();
+          if (!Objects.equals(selectedChannel, channel)) {
+            selectedChannel = channel;
+            setChannelSelection();
+            adapter.setMessages(List.of());
+            binding.loadingIndicator.setVisibility(View.VISIBLE);
+          }
         });
   }
 
@@ -138,17 +157,6 @@ public class HomeFragment extends Fragment implements MenuProvider, OnItemSelect
         binding.channels.setSelection(position, true);
       }
     }
-  }
-
-  @Override
-  public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    Channel channel = (Channel) parent.getItemAtPosition(position);
-    messageViewModel.setSelectedChannel(channel);
-  }
-
-  @Override
-  public void onNothingSelected(AdapterView<?> parent) {
-    // Ignore; this doesn't happen with a Spinner.
   }
 
 }
