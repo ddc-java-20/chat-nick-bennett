@@ -4,13 +4,11 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
-import edu.cnm.deepdive.chat.InstantDeserializer;
 import edu.cnm.deepdive.chat.R;
 import edu.cnm.deepdive.chat.service.ChatServiceLongPollingProxy;
 import edu.cnm.deepdive.chat.service.ChatServiceProxy;
@@ -28,13 +26,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 @InstallIn(SingletonComponent.class)
-public abstract class ProxyModule {
+public class ProxyModule {
 
   ProxyModule() {}
 
   @Provides
   @Singleton
-  static Gson provideGson(JsonDeserializer<Instant> deserializer) {
+  Gson provideGson(JsonDeserializer<Instant> deserializer) {
     return new GsonBuilder()
         .registerTypeAdapter(Instant.class, deserializer)
         .excludeFieldsWithoutExposeAnnotation()
@@ -43,14 +41,14 @@ public abstract class ProxyModule {
 
   @Provides
   @Singleton
-  static Interceptor provideInterceptor(@ApplicationContext Context context, Gson gson) {
+  Interceptor provideInterceptor(@ApplicationContext Context context, Gson gson) {
     return new HttpLoggingInterceptor()
         .setLevel(Level.valueOf(context.getString(R.string.log_level).toUpperCase()));
   }
 
   @Provides
   @Singleton
-  static ChatServiceProxy provideProxy(
+  ChatServiceProxy provideProxy(
       @ApplicationContext Context context, Gson gson, Interceptor interceptor) {
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(interceptor)
@@ -67,7 +65,7 @@ public abstract class ProxyModule {
 
   @Provides
   @Singleton
-  static ChatServiceLongPollingProxy provideLongPollingProxy(
+  ChatServiceLongPollingProxy provideLongPollingProxy(
       @ApplicationContext Context context, Gson gson, Interceptor interceptor) {
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(interceptor)
@@ -84,8 +82,5 @@ public abstract class ProxyModule {
         .build()
         .create(ChatServiceLongPollingProxy.class);
   }
-
-  @Binds
-  abstract JsonDeserializer<Instant> bindJsonDeserializer(InstantDeserializer deserializer);
 
 }
