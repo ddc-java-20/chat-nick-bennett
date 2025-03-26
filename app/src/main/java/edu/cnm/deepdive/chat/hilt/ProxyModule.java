@@ -4,6 +4,7 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
@@ -27,14 +28,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 @InstallIn(SingletonComponent.class)
-public class ProxyModule {
+public abstract class ProxyModule {
 
-  @Inject
   ProxyModule() {}
 
   @Provides
   @Singleton
-  Gson provideGson(InstantDeserializer deserializer) {
+  static Gson provideGson(JsonDeserializer<Instant> deserializer) {
     return new GsonBuilder()
         .registerTypeAdapter(Instant.class, deserializer)
         .excludeFieldsWithoutExposeAnnotation()
@@ -43,14 +43,14 @@ public class ProxyModule {
 
   @Provides
   @Singleton
-  Interceptor provideInterceptor(@ApplicationContext Context context, Gson gson) {
+  static Interceptor provideInterceptor(@ApplicationContext Context context, Gson gson) {
     return new HttpLoggingInterceptor()
         .setLevel(Level.valueOf(context.getString(R.string.log_level).toUpperCase()));
   }
 
   @Provides
   @Singleton
-  ChatServiceProxy provideProxy(
+  static ChatServiceProxy provideProxy(
       @ApplicationContext Context context, Gson gson, Interceptor interceptor) {
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(interceptor)
@@ -67,7 +67,7 @@ public class ProxyModule {
 
   @Provides
   @Singleton
-  ChatServiceLongPollingProxy provideLongPollingProxy(
+  static ChatServiceLongPollingProxy provideLongPollingProxy(
       @ApplicationContext Context context, Gson gson, Interceptor interceptor) {
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(interceptor)
@@ -84,5 +84,8 @@ public class ProxyModule {
         .build()
         .create(ChatServiceLongPollingProxy.class);
   }
+
+  @Binds
+  abstract JsonDeserializer<Instant> bindJsonDeserializer(InstantDeserializer deserializer);
 
 }

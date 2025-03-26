@@ -64,7 +64,7 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
       selectedChannel.postValue(channel);
       //noinspection DataFlowIssue
       messages.getValue().clear();
-      fetchMessages(channel);
+      fetchMessages(channel, getSince(messages.getValue()));
     }
   }
 
@@ -86,21 +86,24 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
   /**
    * @noinspection DataFlowIssue
    */
-  public void fetchMessages(Channel selectedChannel) {
+  public void fetchMessages(Channel selectedChannel, Instant since) {
     if (selectedChannel != null) {
       throwable.postValue(null);
       if (poll != null) {
         poll.dispose();
       }
       List<Message> messages = this.messages.getValue();
-      Instant since = getSince(messages);
       poll = messageService
           .getMessages(selectedChannel.getKey(), since)
           .subscribe(
               (msgs) -> {
-                messages.addAll(msgs);
-                this.messages.postValue(messages);
-                fetchMessages(selectedChannel);
+                if (!msgs.isEmpty()) {
+                  messages.addAll(msgs);
+                  this.messages.postValue(messages);
+                  fetchMessages(selectedChannel, getSince(msgs));
+                } else {
+                  fetchMessages(selectedChannel, since);
+                }
               },
               this::postThrowable,
               pending
@@ -130,7 +133,8 @@ public class MessageViewModel extends ViewModel implements DefaultLifecycleObser
     DefaultLifecycleObserver.super.onResume(owner);
     Channel channel = selectedChannel.getValue();
     if (channel != null) {
-      fetchMessages(channel);
+      //noinspection DataFlowIssue
+      fetchMessages(channel, getSince(messages.getValue()));
     }
   }
 
