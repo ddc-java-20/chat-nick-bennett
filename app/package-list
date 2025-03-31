@@ -358,7 +358,7 @@ androidx.slice
 androidx.slice.builders
 androidx.slice.core
 androidx.slice.widget
-androidx.panelayout.widget
+androidx.slidingpanelayout.widget
 androidx.sqlite.db
 androidx.sqlite.db.framework
 androidx.swiperefreshlayout.widget

@@ -1,0 +1,6 @@
+edu.cnm.deepdive.chat
+edu.cnm.deepdive.chat.configuration
+edu.cnm.deepdive.chat.controller
+edu.cnm.deepdive.chat.dao
+edu.cnm.deepdive.chat.model.entity
+edu.cnm.deepdive.chat.service

@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"edu.cnm.deepdive.chat"},{"l":"edu.cnm.deepdive.chat.configuration"},{"l":"edu.cnm.deepdive.chat.controller"},{"l":"edu.cnm.deepdive.chat.dao"},{"l":"edu.cnm.deepdive.chat.model.entity"},{"l":"edu.cnm.deepdive.chat.service"}];updateSearchResults();
