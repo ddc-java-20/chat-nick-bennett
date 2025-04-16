@@ -2,13 +2,13 @@
 
 # Compiler and standard library versions
 java="21" # For a non-Android project, this may be changed to 21.
-kotlin="2.1.0"
+kotlin="2.1.10"
 
 # Core Android plugin and library versions
-android-gradle = "8.7.3"
+android-gradle = "8.9.1"
 app-compat = "1.7.0"
 lifecycle = "2.8.7"
-navigation = "2.8.8"
+navigation = "2.8.9"
 constraint-layout = "2.2.1"
 recycler-view = "1.4.0"
 fragment = "1.8.6"
@@ -16,7 +16,7 @@ preference = "1.2.1"
 view-pager = "1.1.0"
 
 # Other standard & Google Android library versions
-room = "2.6.1"
+room = "2.7.0"
 hilt = "2.55"
 material = "1.12.0"
 play-services-auth = "21.3.0"
@@ -58,14 +58,6 @@ activity = "1.10.1"
 [libraries]
 
 # Kotlin standard library delegates
-boot-spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
-boot-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
-boot-spring-boot-starter-hateoas = { module = "org.springframework.boot:spring-boot-starter-hateoas" }
-boot-spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
-boot-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
-boot-spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
-boot-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
-h2database-h2 = { module = "com.h2database:h2" }
 kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-jdk7 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlin" }
 kotlin-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
@@ -75,11 +67,6 @@ app-compat = { group = "androidx.appcompat", name = "appcompat", version.ref = "
 constraint-layout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraint-layout" }
 platform-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 recycler-view = { group = "androidx.recyclerview", name ="recyclerview", version.ref = "recycler-view" }
-restdocs-spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc" }
-security-spring-security-test = { module = "org.springframework.security:spring-security-test" }
-spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
-spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
-thymeleaf-extras-springsecurity6 = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
 view-pager = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "view-pager" }
 
 # Fragment & navigation framework libraries
@@ -139,6 +126,7 @@ spring-boot-oauth2-resource-server = { group = "org.springframework.boot", name 
 spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security" }
 spring-boot-starter-thymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf" }
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation" }
 thymeleaf-spring-security = { group = "org.thymeleaf.extras", name = "thymeleaf-extras-springsecurity6" }
 h2 = { group = "com.h2database", name = "h2" }
 spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor" }

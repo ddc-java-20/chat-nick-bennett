@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     java
     alias(libs.plugins.spring.boot)
@@ -54,19 +56,19 @@ configurations {
 extra["snippetsDir"] = file("build/generated-snippets")
 
 dependencies {
-    implementation(libs.boot.spring.boot.starter.data.jpa)
-    implementation(libs.boot.spring.boot.starter.hateoas)
-    implementation(libs.spring.boot.starter.oauth2.resource.server)
-    implementation(libs.boot.spring.boot.starter.security)
-    implementation(libs.boot.spring.boot.starter.thymeleaf)
-    implementation(libs.boot.spring.boot.starter.web)
-    implementation(libs.thymeleaf.extras.springsecurity6)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.hateoas)
+    implementation(libs.spring.boot.oauth2.resource.server)
+    implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.thymeleaf)
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.thymeleaf.spring.security)
     implementation(libs.spring.boot.starter.validation)
-    runtimeOnly(libs.h2database.h2)
-    annotationProcessor(libs.boot.spring.boot.configuration.processor)
-    testImplementation(libs.boot.spring.boot.starter.test)
-    testImplementation(libs.restdocs.spring.restdocs.mockmvc)
-    testImplementation(libs.security.spring.security.test)
+    runtimeOnly(libs.h2)
+    annotationProcessor(libs.spring.boot.configuration.processor)
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.restdocs.mockmvc)
+    testImplementation(libs.spring.security.test)
     testRuntimeOnly(libs.platform.junit.platform.launcher)
 }
 
