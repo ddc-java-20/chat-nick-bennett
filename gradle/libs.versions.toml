@@ -5,7 +5,7 @@ java="21" # For a non-Android project, this may be changed to 21.
 kotlin="2.1.10"
 
 # Core Android plugin and library versions
-android-gradle = "8.9.1"
+android-gradle = "8.9.2"
 app-compat = "1.7.0"
 lifecycle = "2.8.7"
 navigation = "2.8.9"
@@ -54,6 +54,7 @@ android-test-runner = "1.6.2"
 junit-android = "1.6.0"
 espresso = "3.6.1"
 activity = "1.10.1"
+
 
 [libraries]
 
@@ -153,7 +154,9 @@ hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testi
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 
+
 [bundles]
+
 
 [plugins]
 
